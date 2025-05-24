@@ -17,10 +17,10 @@ export default function Navbar() {
       <div className="space-x-4 flex items-center">
         
         <Link href="/negocios" className="text-gray-700 hover:text-blue-600">
-          Negocios
+          Mis negocios
         </Link>
         <Link href="/reservas" className="text-gray-700 hover:text-blue-600">
-          Reservas
+          Reservar
         </Link>
 
         {/* Opciones según el estado de la sesión */}
@@ -29,7 +29,9 @@ export default function Navbar() {
         ) : session ? (
           // Opciones para usuarios autenticados
           <>
-            
+            <Link href="/reservas/mis-reservas" className="text-gray-700 hover:text-blue-600">
+              Mis Reservas
+            </Link>
             <Link href="/perfil" className="text-gray-700 hover:text-blue-600">
               Mi Perfil
             </Link>

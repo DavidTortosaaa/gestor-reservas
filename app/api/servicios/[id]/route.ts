@@ -1,23 +1,38 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
 // 👉 Actualizar un servicio (PUT)
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  try {
-    const body = await req.json();
-    const { nombre, descripcion, duracion, precio } = body;
+  const session = await getServerSession(authOptions);
 
-    const servicioActualizado = await prisma.servicio.update({
-      where: { id: params.id },
-      data: {
-        nombre,
-        descripcion,
-        duracion,
-        precio,
+  if (!session?.user?.email) {
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+  }
+
+  const servicio = await prisma.servicio.findUnique({
+    where: { id: params.id },
+    include: {
+      negocio: {
+        select: { propietario: true },
       },
+    },
+  });
+
+  if (!servicio || servicio.negocio.propietario.email !== session.user.email) {
+    return NextResponse.json({ message: "No autorizado para editar este servicio" }, { status: 403 });
+  }
+
+  try {
+    const { nombre, descripcion, duracion, precio } = await req.json();
+
+    const actualizado = await prisma.servicio.update({
+      where: { id: params.id },
+      data: { nombre, descripcion, duracion, precio },
     });
 
-    return NextResponse.json(servicioActualizado);
+    return NextResponse.json(actualizado);
   } catch (error) {
     console.error("Error actualizando servicio:", error);
     return NextResponse.json({ message: "Error actualizando servicio" }, { status: 500 });
@@ -26,6 +41,25 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
 // 🗑️ Eliminar un servicio (DELETE)
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+  }
+
+  const servicio = await prisma.servicio.findUnique({
+    where: { id: params.id },
+    include: {
+      negocio: {
+        select: { propietario: true },
+      },
+    },
+  });
+
+  if (!servicio || servicio.negocio.propietario.email !== session.user.email) {
+    return NextResponse.json({ message: "No autorizado para eliminar este servicio" }, { status: 403 });
+  }
+
   try {
     await prisma.servicio.delete({
       where: { id: params.id },

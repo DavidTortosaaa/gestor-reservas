@@ -4,29 +4,32 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 
 // Endpoint para actualizar un negocio
+// PUT: Actualizar un negocio (solo el propietario puede)
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.email) {
+  if (!session?.user?.email) {
     return NextResponse.json({ message: "No autorizado" }, { status: 401 });
   }
 
   const data = await req.json();
 
+  const propietario = await prisma.usuario.findUnique({
+    where: { email: session.user.email },
+  });
+
   const negocio = await prisma.negocio.findFirst({
     where: {
       id: params.id,
-      propietario: {
-        email: session.user.email,
-      },
+      propietarioId: propietario?.id,
     },
   });
 
   if (!negocio) {
-    return NextResponse.json({ message: "No autorizado" }, { status: 403 });
+    return NextResponse.json({ message: "No autorizado para editar este negocio" }, { status: 403 });
   }
 
   const negocioActualizado = await prisma.negocio.update({
@@ -44,6 +47,7 @@ export async function PUT(
   return NextResponse.json(negocioActualizado);
 }
 
+
 // Endpoint para eliminar un negocio
 export async function DELETE(
   _req: Request,
@@ -51,21 +55,23 @@ export async function DELETE(
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.email) {
+  if (!session?.user?.email) {
     return NextResponse.json({ message: "No autorizado" }, { status: 401 });
   }
+
+  const propietario = await prisma.usuario.findUnique({
+    where: { email: session.user.email },
+  });
 
   const negocio = await prisma.negocio.findFirst({
     where: {
       id: params.id,
-      propietario: {
-        email: session.user.email,
-      },
+      propietarioId: propietario?.id,
     },
   });
 
   if (!negocio) {
-    return NextResponse.json({ message: "No autorizado" }, { status: 403 });
+    return NextResponse.json({ message: "No autorizado para eliminar este negocio" }, { status: 403 });
   }
 
   try {

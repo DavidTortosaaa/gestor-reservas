@@ -30,7 +30,7 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
   };
 
   return (
-    <li className="p-4 border rounded bg-white shadow">
+    <li className="p-4 border rounded bg-white shadow text-black">
       <h2 className="text-lg font-semibold">{servicio.nombre}</h2>
       {servicio.descripcion && <p>{servicio.descripcion}</p>}
       <p>Duración: {servicio.duracion} min</p>
@@ -52,4 +52,4 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
       </div>
     </li>
   );
-}//estilos
+}

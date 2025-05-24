@@ -1,4 +1,4 @@
-/*import { getServerSession } from "next-auth"
+import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
@@ -30,7 +30,7 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Servicios de {negocio.nombre}</h1>
+      <h1 className="text-2xl font-bold mb-4 ">Servicios de {negocio.nombre}</h1>
       <p className="mb-6">{negocio.direccion}</p>
 
       {negocio.servicios.length === 0 ? (
@@ -48,4 +48,4 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
       )}
     </div>
   )
-}*/
+}

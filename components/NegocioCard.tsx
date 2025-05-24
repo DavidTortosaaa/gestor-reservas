@@ -51,6 +51,13 @@ export default function NegocioCard({ negocio }: NegocioCardProps) {
           Ver Servicios
         </Link>
 
+        <Link
+          href={`/negocios/${negocio.id}/reservas`}
+          className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700"
+        >
+          Mostrar Reservas
+        </Link>
+
         <button
           onClick={handleDelete}
           className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"

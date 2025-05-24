@@ -14,7 +14,7 @@ interface NegocioPublicoCardProps {
 
 export default function NegocioPublicoCard({ negocio }: NegocioPublicoCardProps) {
   return (
-    <li className="p-4 border rounded bg-white shadow">
+    <li className="p-4 border rounded bg-white shadow text-black">
       <h2 className="text-xl font-semibold">{negocio.nombre}</h2>
       <p>{negocio.direccion}</p>
       <p>Horario: {negocio.horario_apertura} - {negocio.horario_cierre}</p>
