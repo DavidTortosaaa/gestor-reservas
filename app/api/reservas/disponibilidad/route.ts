@@ -10,7 +10,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Faltan datos" }, { status: 400 });
     }
 
-    // Buscar reservas para ese día y servicio
+    const servicio = await prisma.servicio.findUnique({
+      where: { id: servicioId },
+    });
+
+    if (!servicio) {
+      return NextResponse.json({ message: "Servicio no encontrado" }, { status: 404 });
+    }
+
+    const duracionMs = servicio.duracion * 60 * 1000;
+
     const fechaInicio = new Date(`${fecha}T00:00:00`);
     const fechaFin = new Date(`${fecha}T23:59:59`);
 
@@ -21,15 +30,29 @@ export async function POST(req: Request) {
           gte: fechaInicio,
           lte: fechaFin,
         },
+        estado: {
+          not: "cancelada",
+        },
       },
       select: {
         fechaHora: true,
       },
     });
 
-    const horasOcupadas = reservas.map(r =>
-      r.fechaHora.toTimeString().slice(0, 5)
-    );
+    const horasOcupadas: string[] = [];
+
+    reservas.forEach((r) => {
+      const inicio = new Date(r.fechaHora);
+      const fin = new Date(inicio.getTime() + duracionMs);
+
+      // Bloquea cada intervalo de 5 minutos dentro del rango reservado
+      for (let t = inicio.getTime(); t < fin.getTime(); t += 5 * 60 * 1000) {
+        const hora = new Date(t).toTimeString().slice(0, 5);
+        if (!horasOcupadas.includes(hora)) {
+          horasOcupadas.push(hora);
+        }
+      }
+    });
 
     return NextResponse.json({ horasOcupadas });
   } catch (error) {

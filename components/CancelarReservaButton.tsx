@@ -1,5 +1,7 @@
 "use client";
 
+import { showSuccess, showError } from "@/lib/toast"; // ✅ importar toast
+
 type Props = {
   reservaId: string;
 };
@@ -18,9 +20,10 @@ export default function CancelarReservaButton({ reservaId }: Props) {
     });
 
     if (res.ok) {
+      showSuccess("Reserva cancelada correctamente");
       window.location.reload();
     } else {
-      alert("No se pudo cancelar la reserva.");
+      showError("No se pudo cancelar la reserva");
     }
   }
 

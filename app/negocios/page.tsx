@@ -8,13 +8,21 @@ import Link from "next/link"
 export default async function NegociosPage() {
   const session = await getServerSession(authOptions)
 
-  if (!session) {
+  if (!session?.user?.email) {
     redirect("/login")
   }
-
+  
+  const usuario = await prisma.usuario.findUnique({
+    where: { email: session.user.email },
+  })
+  
+  if (!usuario) {
+    redirect("/login")
+  }
+  
   const negocios = await prisma.negocio.findMany({
     where: {
-      propietarioId: session.user.id,
+      propietarioId: usuario.id,
     },
   })
 

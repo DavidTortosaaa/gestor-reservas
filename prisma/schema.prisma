@@ -19,6 +19,9 @@ model Usuario {
   email     String  @unique
   password  String
   telefono  String?
+  latitud   Float?
+  longitud  Float?
+  direccion String?
   negocios  Negocio[]
   reservas  Reserva[]
 }
@@ -28,6 +31,8 @@ model Negocio {
   nombre      String
   email       String     @unique
   telefono    String?
+  latitud   Float?
+  longitud  Float?
   direccion   String?
   horario_apertura String
   horario_cierre   String
@@ -42,17 +47,18 @@ model Servicio {
   descripcion String?
   duracion   Int
   precio     Float
-  negocio    Negocio   @relation(fields: [negocioId], references: [id])
+  negocio    Negocio   @relation(fields: [negocioId], references: [id], onDelete: Cascade)
   negocioId  String
   reservas   Reserva[]
 }
 
 model Reserva {
   id         String   @id @default(uuid())
-  cliente    Usuario  @relation(fields: [clienteId], references: [id])
+  cliente    Usuario  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   clienteId  String
-  servicio   Servicio @relation(fields: [servicioId], references: [id])
+  servicio   Servicio @relation(fields: [servicioId], references: [id], onDelete: Cascade)
   servicioId String
   fechaHora  DateTime
   estado     String
 }
+

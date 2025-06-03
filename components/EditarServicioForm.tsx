@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { showSuccess, showError } from "@/lib/toast";
 
 type EditarServicioFormProps = {
   servicio: {
@@ -26,6 +27,7 @@ export default function EditarServicioForm({ servicio }: EditarServicioFormProps
 
     const res = await fetch(`/api/servicios/${servicio.id}`, {
       method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nombre,
         descripcion,
@@ -35,10 +37,11 @@ export default function EditarServicioForm({ servicio }: EditarServicioFormProps
     });
 
     if (res.ok) {
+      showSuccess("Servicio editado correctamente");
       router.push(`/negocios/${servicio.negocioId}/servicios`);
     } else {
       const error = await res.json();
-      alert("Error al editar servicio: " + error.message);
+      showError("Error al editar servicio: " + error.message);
     }
   };
 

@@ -9,27 +9,27 @@ export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions)
 
   if (!session?.user?.email) {
-    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 })
   }
 
-  const data = await req.json();
+  const data = await req.json()
 
   const propietario = await prisma.usuario.findUnique({
-    where: { email: session.user.email },
-  });
+    where: { email: session.user.email }
+  })
 
   const negocio = await prisma.negocio.findFirst({
     where: {
       id: params.id,
       propietarioId: propietario?.id,
     },
-  });
+  })
 
   if (!negocio) {
-    return NextResponse.json({ message: "No autorizado para editar este negocio" }, { status: 403 });
+    return NextResponse.json({ message: "No autorizado para editar este negocio" }, { status: 403 })
   }
 
   const negocioActualizado = await prisma.negocio.update({
@@ -39,12 +39,14 @@ export async function PUT(
       email: data.email,
       telefono: data.telefono,
       direccion: data.direccion,
+      latitud: data.latitud,
+      longitud: data.longitud,
       horario_apertura: data.horario_apertura,
       horario_cierre: data.horario_cierre,
     },
-  });
+  })
 
-  return NextResponse.json(negocioActualizado);
+  return NextResponse.json(negocioActualizado)
 }
 
 

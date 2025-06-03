@@ -1,6 +1,7 @@
 'use client'
 
 import Link from "next/link"
+import { showSuccess, showError } from "@/lib/toast"
 
 interface NegocioCardProps {
   negocio: {
@@ -24,7 +25,11 @@ export default function NegocioCard({ negocio }: NegocioCardProps) {
     })
 
     if (res.ok) {
-      window.location.reload()
+      showSuccess("Negocio eliminado correctamente")
+      setTimeout(() => window.location.reload(), 1500)
+    } else {
+      const error = await res.json()
+      showError(error.message || "Error al eliminar el negocio")
     }
   }
 

@@ -2,6 +2,9 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 import AuthProvider from '@/lib/auth'
 import { ReactNode } from 'react'
+import 'react-datepicker/dist/react-datepicker.css';
+import { Toaster } from 'react-hot-toast'
+import { toastOptions } from '@/lib/toast-options'
 
 export const metadata = {
   title: 'Gestor de Reservas',
@@ -15,6 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AuthProvider>
           <Navbar />
           <main className="p-6">{children}</main>
+          <Toaster {...toastOptions} />
         </AuthProvider>
       </body>
     </html>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import DatePicker from "react-datepicker"
+import { showSuccess, showError } from "@/lib/toast" // ✅ Toast helpers
 
 type ReservaFormProps = {
   servicioId: string
@@ -10,7 +12,13 @@ type ReservaFormProps = {
   cierre: string
 }
 
-function generarHorasDisponibles(apertura: string, cierre: string, duracion: number, fecha: string, horasOcupadas: string[]): string[] {
+function generarHorasDisponibles(
+  apertura: string,
+  cierre: string,
+  duracion: number,
+  fecha: string,
+  horasOcupadas: string[]
+): string[] {
   if (!fecha) return []
 
   const [horaA, minutoA] = apertura.split(":").map(Number)
@@ -18,7 +26,6 @@ function generarHorasDisponibles(apertura: string, cierre: string, duracion: num
 
   const now = new Date()
   const fechaSel = new Date(fecha)
-
   const esHoy = now.toDateString() === fechaSel.toDateString()
 
   const start = new Date(fechaSel)
@@ -26,6 +33,7 @@ function generarHorasDisponibles(apertura: string, cierre: string, duracion: num
 
   const end = new Date(fechaSel)
   end.setHours(horaC, minutoC, 0, 0)
+  if (end <= start) end.setDate(end.getDate() + 1)
 
   const horas: string[] = []
   const slot = new Date(start)
@@ -46,24 +54,25 @@ function generarHorasDisponibles(apertura: string, cierre: string, duracion: num
 
 export default function ReservaForm({ servicioId, duracion, apertura, cierre }: ReservaFormProps) {
   const router = useRouter()
-  const [fecha, setFecha] = useState("")
+  const [fecha, setFecha] = useState<Date | null>(null)
   const [hora, setHora] = useState("")
   const [horasDisponibles, setHorasDisponibles] = useState<string[]>([])
 
   useEffect(() => {
     const fetchHoras = async () => {
       if (!fecha) return
+      const fechaISO = fecha.toISOString().split("T")[0]
 
       const res = await fetch("/api/reservas/disponibilidad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ servicioId, fecha }),
+        body: JSON.stringify({ servicioId, fecha: fechaISO }),
       })
 
       const data = await res.json()
-      const horas = generarHorasDisponibles(apertura, cierre, duracion, fecha, data.horasOcupadas || [])
+      const horas = generarHorasDisponibles(apertura, cierre, duracion, fechaISO, data.horasOcupadas || [])
       setHorasDisponibles(horas)
-      setHora("") // Reset al cambiar fecha
+      setHora("")
     }
 
     fetchHoras()
@@ -71,22 +80,26 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!fecha || !hora) return alert("Selecciona fecha y hora")
+    if (!fecha || !hora) {
+      showError("Selecciona fecha y hora")
+      return
+    }
 
-    const fechaHora = new Date(`${fecha}T${hora}:00`)
+    const fechaISO = fecha.toISOString().split("T")[0]
+    const fechaHora = new Date(`${fechaISO}T${hora}:00`)
 
     const res = await fetch("/api/reservas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ servicioId,fechaHora, estado: "pendiente" }),
+      body: JSON.stringify({ servicioId, fechaHora, estado: "pendiente" }),
     })
 
     if (res.ok) {
-      alert("Reserva creada correctamente")
+      showSuccess("Reserva creada correctamente")
       router.push("/reservas/mis-reservas")
     } else {
       const error = await res.json()
-      alert("Error al crear reserva: " + error.message)
+      showError("Error al crear reserva: " + error.message)
     }
   }
 
@@ -94,17 +107,18 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
     <form onSubmit={handleSubmit} className="space-y-4 mt-4">
       <label className="block">
         Fecha:
-        <input
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          required
-          min={new Date().toISOString().split("T")[0]}
+        <DatePicker
+          selected={fecha}
+          onChange={(date) => setFecha(date)}
+          minDate={new Date()}
+          filterDate={(date) => date.getDay() !== 0 && date.getDay() !== 6}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="Selecciona una fecha"
           className="block w-full mt-1 border p-2 rounded text-black"
         />
       </label>
 
-      <label className="block ">
+      <label className="block">
         Hora:
         <select
           value={hora}
@@ -129,4 +143,3 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
     </form>
   )
 }
-//estilo

@@ -1,16 +1,17 @@
 'use client'
 
-import Link from "next/link";
+import Link from "next/link"
+import { showSuccess, showError } from "@/lib/toast"
 
 interface ServicioCardProps {
   servicio: {
-    id: string;
-    nombre: string;
-    descripcion?: string | null;
-    duracion: number;
-    precio: number;
-    negocioId: string;
-  };
+    id: string
+    nombre: string
+    descripcion?: string | null
+    duracion: number
+    precio: number
+    negocioId: string
+  }
 }
 
 export default function ServicioCard({ servicio }: ServicioCardProps) {
@@ -23,9 +24,10 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
     });
 
     if (res.ok) {
+      showSuccess("Servicio eliminado correctamente");
       window.location.reload();
     } else {
-      alert("Hubo un error al eliminar el servicio");
+      showError("Hubo un error al eliminar el servicio");
     }
   };
 
@@ -51,5 +53,5 @@ export default function ServicioCard({ servicio }: ServicioCardProps) {
         </button>
       </div>
     </li>
-  );
+  )
 }

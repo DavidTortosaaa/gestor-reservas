@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { showSuccess, showError } from "@/lib/toast";
 
 type NuevoServicioFormProps = {
   negocioId: string;
@@ -19,6 +20,7 @@ export default function NuevoServicioForm({ negocioId }: NuevoServicioFormProps)
 
     const res = await fetch(`/api/servicios`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nombre,
         descripcion,
@@ -29,10 +31,11 @@ export default function NuevoServicioForm({ negocioId }: NuevoServicioFormProps)
     });
 
     if (res.ok) {
+      showSuccess("Servicio creado correctamente");
       router.push(`/negocios/${negocioId}/servicios`);
     } else {
       const error = await res.json();
-      alert("Error al crear servicio: " + error.message);
+      showError("Error al crear servicio: " + error.message);
     }
   };
 

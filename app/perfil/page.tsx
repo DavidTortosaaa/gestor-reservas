@@ -2,6 +2,8 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { redirect } from "next/navigation"
+import ProfileForm from "@/components/ProfileForm"
+
 
 export default async function PerfilPage() {
   const session = await getServerSession(authOptions)
@@ -12,8 +14,8 @@ export default async function PerfilPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Mi Perfil</h1>
-      <p className="text-gray-700">Bienvenido, {session.user?.email}</p>
+      <h1 className="text-2xl font-bold mb-6">Mi Perfil</h1>
+      <ProfileForm />
     </div>
   )
 }

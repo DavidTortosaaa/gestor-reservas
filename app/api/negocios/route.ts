@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 
-// Endpoint para crear un nuevo negocio
+// POST: Crear nuevo negocio
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
 
@@ -28,6 +28,8 @@ export async function POST(req: Request) {
         email: data.email,
         telefono: data.telefono,
         direccion: data.direccion,
+        latitud: data.latitud,
+        longitud: data.longitud,
         horario_apertura: data.horario_apertura,
         horario_cierre: data.horario_cierre,
         propietarioId: propietario.id
