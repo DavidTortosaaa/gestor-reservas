@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import NegocioPublicoCard from "@/components/NegocioPublicoCard";
 
+/**
+ * Componente NegociosCliente
+ * 
+ * Este componente muestra una lista de negocios disponibles para reservar servicios.
+ * Permite filtrar negocios por nombre y mostrar solo negocios cercanos a la ubicación del usuario.
+ */
 export default function NegociosCliente({
   negocios,
   filtroInicial,
@@ -11,16 +17,49 @@ export default function NegociosCliente({
   negocios: any[];
   filtroInicial: string;
 }) {
+  /**
+   * Estado local para almacenar el texto de búsqueda.
+   * 
+   * @default filtroInicial - Texto inicial para filtrar negocios.
+   */
   const [buscar, setBuscar] = useState(filtroInicial || "");
+
+  /**
+   * Estado local para controlar si se muestran solo negocios cercanos.
+   * 
+   * @default false - Indica que se muestran todos los negocios.
+   */
   const [mostrarCercanos, setMostrarCercanos] = useState(false);
+
+  /**
+   * Estado local para almacenar los negocios cercanos obtenidos del servidor.
+   * 
+   * @default [] - Lista vacía de negocios cercanos.
+   */
   const [negociosCercanos, setNegociosCercanos] = useState<any[]>([]);
+
+  /**
+   * Estado local para gestionar el estado de carga mientras se obtienen negocios cercanos.
+   * 
+   * @default false - Indica que no se está realizando ninguna solicitud.
+   */
   const [loadingCercanos, setLoadingCercanos] = useState(false);
 
+  /**
+   * Efecto para cargar negocios cercanos cuando se activa el filtro.
+   * 
+   * Realiza una solicitud al servidor para obtener negocios cercanos.
+   */
   useEffect(() => {
     const fetchCercanos = async () => {
       if (!mostrarCercanos) return;
       setLoadingCercanos(true);
       try {
+        /**
+         * Solicitud al servidor para obtener negocios cercanos.
+         * 
+         * @endpoint /api/negocios/cercanos - Devuelve una lista de negocios cercanos.
+         */
         const res = await fetch("/api/negocios/cercanos");
         const data = await res.json();
         setNegociosCercanos(data);
@@ -33,15 +72,29 @@ export default function NegociosCliente({
     fetchCercanos();
   }, [mostrarCercanos]);
 
+  /**
+   * Filtra los negocios según el texto de búsqueda y el estado del filtro de cercanía.
+   * 
+   * @returns Una lista de negocios que coinciden con el filtro.
+   */
   const negociosFiltrados = (mostrarCercanos ? negociosCercanos : negocios).filter((n) =>
     n.nombre.toLowerCase().includes(buscar.toLowerCase())
   );
 
+  /**
+   * Renderiza la interfaz de usuario para mostrar negocios disponibles.
+   * 
+   * Incluye un filtro de búsqueda, un interruptor para mostrar negocios cercanos,
+   * y una lista de negocios filtrados.
+   */
   return (
     <div className="max-w-5xl mx-auto px-4 text-black">
+      {/* Título de la página */}
       <h1 className="text-3xl font-bold mb-6 text-white">Reservar un Servicio</h1>
 
+      {/* Filtros y opciones */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        {/* Enlace para ver las reservas del usuario */}
         <Link
           href="/reservas/mis-reservas"
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
@@ -49,6 +102,7 @@ export default function NegociosCliente({
           Ver Mis Reservas
         </Link>
 
+        {/* Interruptor para mostrar negocios cercanos */}
         <div className="flex items-center gap-3">
           <label htmlFor="switch" className="text-black bg-white px-2 rounded cursor-pointer">
             Mostrar solo negocios cercanos
@@ -67,6 +121,7 @@ export default function NegociosCliente({
         </div>
       </div>
 
+      {/* Campo de búsqueda */}
       <form onSubmit={(e) => e.preventDefault()} className="mb-6">
         <input
           type="text"
@@ -77,6 +132,7 @@ export default function NegociosCliente({
         />
       </form>
 
+      {/* Mensajes de estado y lista de negocios */}
       {mostrarCercanos && loadingCercanos ? (
         <p className="text-white">Cargando negocios cercanos...</p>
       ) : negociosFiltrados.length === 0 ? (

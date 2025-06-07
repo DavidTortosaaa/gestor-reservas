@@ -2,23 +2,39 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { OpcionesReservaButtons } from "@/components/OpcionesReservaButtons";
 import PageWrapper from "@/components/ui/PageWrapper";
 import ReservaAdminCard from "@/components/ReservaAdminCard";
 import Link from "next/link";
 
 type PageProps = {
-  params: { id: string };
-  searchParams?: { estado?: string; fecha?: string };
+  params: { id: string }; // ID único del negocio
+  searchParams?: { estado?: string; fecha?: string }; // Parámetros de búsqueda para filtrar reservas
 };
 
+/**
+ * Página ReservasNegocioPage
+ * 
+ * Esta página muestra las reservas asociadas a un negocio específico.
+ * Permite filtrar las reservas por estado y fecha.
+ * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
+ */
 export default async function ReservasNegocioPage({ params, searchParams }: PageProps) {
+  /**
+   * Obtiene la sesión del usuario desde el servidor.
+   * 
+   * Utiliza `next-auth` para verificar si el usuario está autenticado.
+   */
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  const estadoFiltro = searchParams?.estado;
-  const fechaFiltro = searchParams?.fecha;
+  const estadoFiltro = searchParams?.estado; // Filtro por estado de la reserva
+  const fechaFiltro = searchParams?.fecha; // Filtro por fecha de la reserva
 
+  /**
+   * Elimina reservas pasadas que están pendientes o canceladas.
+   * 
+   * Utiliza Prisma para limpiar la base de datos de reservas obsoletas.
+   */
   await prisma.reserva.deleteMany({
     where: {
       fechaHora: { lt: new Date() },
@@ -29,6 +45,11 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
     },
   });
 
+  /**
+   * Obtiene los datos del negocio desde la base de datos.
+   * 
+   * Utiliza Prisma para buscar el negocio por su ID y verificar que el usuario autenticado es el propietario.
+   */
   const negocio = await prisma.negocio.findFirst({
     where: {
       id: params.id,
@@ -57,8 +78,14 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
     },
   });
 
+  /**
+   * Redirige al usuario a la página de negocios si no se encuentra el negocio o no es propietario.
+   */
   if (!negocio) redirect("/negocios");
 
+  /**
+   * Procesa las reservas para agruparlas por día.
+   */
   const reservas = negocio.servicios.flatMap((servicio) =>
     servicio.reservas.map((reserva) => ({
       ...reserva,
@@ -73,6 +100,11 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
     return acc;
   }, {} as Record<string, typeof reservas>);
 
+  /**
+   * Renderiza la página de reservas del negocio.
+   * 
+   * Incluye filtros por estado y fecha, y muestra las reservas agrupadas por día.
+   */
   return (
     <PageWrapper>
       <h1 className="text-3xl font-bold text-white mb-6">Reservas de {negocio.nombre}</h1>

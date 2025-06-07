@@ -11,13 +11,33 @@ type PageProps = {
   };
 };
 
+/**
+ * Página ServiciosDelNegocio
+ * 
+ * Esta página muestra los servicios disponibles en un negocio específico.
+ * Si el usuario no está autenticado, redirige a la página de inicio de sesión.
+ * Si el negocio no existe, redirige a la página de reservas.
+ */
 export default async function ServiciosDelNegocio({ params }: PageProps) {
+  /**
+   * Obtiene la sesión del usuario desde el servidor.
+   * 
+   * Utiliza `next-auth` para verificar si el usuario está autenticado.
+   */
   const session = await getServerSession(authOptions);
 
+  /**
+   * Redirige al usuario a la página de inicio de sesión si no está autenticado.
+   */
   if (!session) {
     redirect("/login");
   }
 
+  /**
+   * Obtiene los datos del negocio desde la base de datos.
+   * 
+   * Utiliza Prisma para buscar el negocio por su ID e incluir los servicios asociados.
+   */
   const negocio = await prisma.negocio.findUnique({
     where: { id: params.id },
     include: {
@@ -25,10 +45,18 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
     },
   });
 
+  /**
+   * Redirige al usuario a la página de reservas si el negocio no existe.
+   */
   if (!negocio) {
     redirect("/reservas");
   }
 
+  /**
+   * Renderiza la página de servicios disponibles en el negocio.
+   * 
+   * Incluye un título, dirección del negocio (si está disponible) y una lista de servicios.
+   */
   return (
     <PageWrapper>
       <h1 className="text-3xl font-bold mb-2 text-white">

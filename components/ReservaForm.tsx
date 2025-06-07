@@ -11,12 +11,25 @@ import PrimaryButton from "@/components/ui/PrimaryButton";
 import LabelledField from "@/components/ui/LabelledField";
 
 type ReservaFormProps = {
-  servicioId: string;
-  duracion: number;
-  apertura: string;
-  cierre: string;
+  servicioId: string; // ID único del servicio que se desea reservar
+  duracion: number; // Duración del servicio en minutos
+  apertura: string; // Hora de apertura del negocio (formato HH:mm)
+  cierre: string; // Hora de cierre del negocio (formato HH:mm)
 };
 
+/**
+ * Función para generar las horas disponibles para reservar un servicio.
+ * 
+ * Calcula las horas disponibles según la apertura, cierre, duración del servicio,
+ * fecha seleccionada y las horas ocupadas obtenidas del servidor.
+ * 
+ * @param apertura - Hora de apertura del negocio
+ * @param cierre - Hora de cierre del negocio
+ * @param duracion - Duración del servicio en minutos
+ * @param fecha - Fecha seleccionada para la reserva
+ * @param horasOcupadas - Lista de horas ocupadas en la fecha seleccionada
+ * @returns Lista de horas disponibles para reservar
+ */
 function generarHorasDisponibles(
   apertura: string,
   cierre: string,
@@ -57,12 +70,24 @@ function generarHorasDisponibles(
   return horas;
 }
 
+/**
+ * Componente ReservaForm
+ * 
+ * Este componente muestra un formulario para reservar un servicio.
+ * Permite seleccionar una fecha y hora disponibles para realizar la reserva.
+ */
 export default function ReservaForm({ servicioId, duracion, apertura, cierre }: ReservaFormProps) {
   const router = useRouter();
-  const [fecha, setFecha] = useState<Date | null>(null);
-  const [hora, setHora] = useState("");
-  const [horasDisponibles, setHorasDisponibles] = useState<string[]>([]);
+  const [fecha, setFecha] = useState<Date | null>(null); // Fecha seleccionada para la reserva
+  const [hora, setHora] = useState(""); // Hora seleccionada para la reserva
+  const [horasDisponibles, setHorasDisponibles] = useState<string[]>([]); // Lista de horas disponibles
 
+  /**
+   * Efecto para cargar las horas disponibles cuando se selecciona una fecha.
+   * 
+   * Realiza una solicitud al servidor para obtener las horas ocupadas en la fecha seleccionada.
+   * Calcula las horas disponibles utilizando la función `generarHorasDisponibles`.
+   */
   useEffect(() => {
     const fetchHoras = async () => {
       if (!fecha) return;
@@ -83,6 +108,12 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
     fetchHoras();
   }, [fecha, servicioId, apertura, cierre, duracion]);
 
+  /**
+   * Maneja el envío del formulario.
+   * 
+   * Realiza una solicitud POST al servidor para crear la reserva.
+   * Muestra mensajes de éxito o error según el resultado de la solicitud.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fecha || !hora) {
@@ -108,9 +139,15 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
     }
   };
 
+  /**
+   * Renderiza el formulario para reservar un servicio.
+   * 
+   * Incluye campos para seleccionar fecha y hora, y un botón para confirmar la reserva.
+   */
   return (
     <FormWrapper title="Reservar servicio">
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Campo para seleccionar la fecha */}
         <LabelledField label="Fecha:">
           <DatePicker
             selected={fecha}
@@ -124,6 +161,7 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
           />
         </LabelledField>
 
+        {/* Campo para seleccionar la hora */}
         <LabelledField label="Hora:">
           <select
             value={hora}
@@ -139,6 +177,7 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
           </select>
         </LabelledField>
 
+        {/* Botón para confirmar la reserva */}
         <PrimaryButton type="submit">
           Reservar
         </PrimaryButton>
