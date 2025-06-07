@@ -56,7 +56,7 @@ export default async function NegociosPage() {
   return (
     <PageWrapper>
       {/* Título de la página */}
-      <h1 className="text-3xl font-bold mb-6 text-white">Mis Negocios</h1>
+      <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-700 to-blue-900 px-6 py-4 rounded shadow-lg w-fit mb-6">Mis Negocios</h1>
 
       {/* Botón para crear un nuevo negocio */}
       <Link

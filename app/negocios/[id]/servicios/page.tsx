@@ -63,7 +63,7 @@ export default async function ServiciosPage({ params }: PageProps) {
   return (
     <PageWrapper>
       {/* Título de la página */}
-      <h1 className="text-2xl font-bold mb-4 text-white">Servicios de {negocio.nombre}</h1>
+      <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-700 to-blue-900 px-6 py-4 rounded shadow-lg w-fit mb-6">Servicios de {negocio.nombre}</h1>
 
       {/* Botón para crear un nuevo servicio */}
       <Link

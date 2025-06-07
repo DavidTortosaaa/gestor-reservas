@@ -90,7 +90,7 @@ export default function NegociosCliente({
   return (
     <div className="max-w-5xl mx-auto px-4 text-black">
       {/* Título de la página */}
-      <h1 className="text-3xl font-bold mb-6 text-white">Reservar un Servicio</h1>
+      <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-700 to-blue-900 px-6 py-4 rounded shadow-lg w-fit mb-6">Reservar un Servicio</h1>
 
       {/* Filtros y opciones */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">

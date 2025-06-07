@@ -59,7 +59,7 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
    */
   return (
     <PageWrapper>
-      <h1 className="text-3xl font-bold mb-2 text-white">
+      <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-700 to-blue-900 px-6 py-4 rounded shadow-lg w-fit mb-6">
         Servicios disponibles en {negocio.nombre}
       </h1>
       {negocio.direccion && (

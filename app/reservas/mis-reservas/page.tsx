@@ -97,11 +97,11 @@ export default async function MisReservasPage() {
    */
   return (
     <PageWrapper>
-      <h1 className="text-3xl font-bold mb-6 text-white">Mis reservas</h1>
+      <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-700 to-blue-900 px-6 py-4 rounded shadow-lg w-fit mb-6">Mis reservas</h1>
 
       {gruposOrdenados.map(([negocioId, grupo]) => (
         <div key={negocioId} className="mb-10 text-white">
-          <h2 className="text-2xl font-semibold mb-4">{grupo.nombre}</h2>
+          <h2 className="flex items-center gap-2 text-white font-bold text-lg bg-gradient-to-br from-blue-600 to-blue-800 px-6 py-3 rounded-t-lg shadow-md w-fit mb-6">🏢 {grupo.nombre}</h2>
 
           {/* Futuras */}
           <section className="mb-6">

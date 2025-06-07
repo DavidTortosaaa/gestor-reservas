@@ -111,7 +111,7 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
    */
   return (
     <PageWrapper>
-      <h1 className="text-3xl font-bold text-white mb-6">Reservas de {negocio.nombre}</h1>
+      <h1 className="text-4xl font-bold text-white bg-gradient-to-r from-blue-700 to-blue-900 px-6 py-4 rounded shadow-lg w-fit mb-6">Reservas de {negocio.nombre}</h1>
 
       {/* Filtros */}
       <div className="mb-6 bg-white rounded-lg shadow p-4 text-black space-y-4">
