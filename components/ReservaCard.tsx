@@ -37,7 +37,7 @@ export default function ReservaCard({ reserva, esPasada = false }: Props) {
     <li className={`${esPasada ? "bg-gray-100" : "bg-white"} p-4 rounded shadow text-black`}>
       {/* Información del negocio */}
       <p>
-        <strong>Negocio:</strong> {reserva.servicio.negocio.nombre}
+        <strong>{reserva.servicio.negocio.nombre}</strong> 
       </p>
 
       {/* Información del servicio */}
