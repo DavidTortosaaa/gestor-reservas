@@ -14,19 +14,21 @@ interface NegocioPublicoCardProps {
 
 export default function NegocioPublicoCard({ negocio }: NegocioPublicoCardProps) {
   return (
-    <div className="p-4 border rounded bg-white shadow text-black">
-      <h2 className="text-xl font-semibold">{negocio.nombre}</h2>
-      <p>{negocio.direccion}</p>
-      <p>Horario: {negocio.horario_apertura} - {negocio.horario_cierre}</p>
+    <div className="p-6 border rounded-lg bg-white shadow text-black">
+      <h2 className="text-xl font-bold mb-2">{negocio.nombre}</h2>
+      <p className="text-sm text-gray-700 mb-1">
+        {negocio.direccion || "Dirección no especificada"}
+      </p>
+      <p className="text-sm text-gray-700 mb-4">
+        Horario: {negocio.horario_apertura} - {negocio.horario_cierre}
+      </p>
 
-      <div className="mt-3">
-        <Link
-          href={`/reservas/${negocio.id}`}
-          className="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-        >
-          Ver servicios
-        </Link>
-      </div>
+      <Link
+        href={`/reservas/${negocio.id}`}
+        className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+      >
+        Ver servicios
+      </Link>
     </div>
   )
-}//estilo
+}

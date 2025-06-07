@@ -1,15 +1,20 @@
 "use client";
 
-import { showSuccess, showError } from "@/lib/toast"; // ✅ importar toast
+import { useState } from "react";
+import { showSuccess, showError } from "@/lib/toast";
 
 type Props = {
   reservaId: string;
 };
 
 export default function CancelarReservaButton({ reservaId }: Props) {
-  async function cancelarReserva() {
-    const confirmacion = confirm("¿Seguro que deseas cancelar esta reserva?");
-    if (!confirmacion) return;
+  const [loading, setLoading] = useState(false);
+
+  const cancelarReserva = async () => {
+    const confirmar = confirm("¿Seguro que deseas cancelar esta reserva?");
+    if (!confirmar) return;
+
+    setLoading(true);
 
     const res = await fetch(`/api/reservas/${reservaId}/estado`, {
       method: "PATCH",
@@ -25,14 +30,17 @@ export default function CancelarReservaButton({ reservaId }: Props) {
     } else {
       showError("No se pudo cancelar la reserva");
     }
-  }
+
+    setLoading(false);
+  };
 
   return (
     <button
-      className="mt-2 px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
       onClick={cancelarReserva}
+      disabled={loading}
+      className="mt-2 px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
     >
-      Cancelar
+      {loading ? "Cancelando..." : "Cancelar"}
     </button>
   );
 }

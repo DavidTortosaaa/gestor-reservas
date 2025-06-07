@@ -1,29 +1,30 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import MapaUbicacion from "@/components/MapaUbicacion";
-import { showSuccess, showError } from "@/lib/toast";
-import FormWrapper from "@/components/ui/FormWrapper"
-import LabelledField from "@/components/ui/LabelledField"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import MapaUbicacion from "@/components/MapaUbicacion"
+import { showSuccess, showError } from "@/lib/toast"
 import InputField from "@/components/ui/InputField"
+import LabelledField from "@/components/ui/LabelledField"
+import FormWrapper from "@/components/ui/FormWrapper"
 import PrimaryButton from "@/components/ui/PrimaryButton"
 
-export default function EditarNegocioForm({ negocio }: { negocio: any }) {
-  const [nombre, setNombre] = useState(negocio.nombre);
-  const [email, setEmail] = useState(negocio.email);
-  const [telefono, setTelefono] = useState(negocio.telefono || "");
-  const [direccion, setDireccion] = useState(negocio.direccion || "");
-  const [latitud, setLatitud] = useState(negocio.latitud || null);
-  const [longitud, setLongitud] = useState(negocio.longitud || null);
-  const [horario_apertura, setHorarioApertura] = useState(negocio.horario_apertura);
-  const [horario_cierre, setHorarioCierre] = useState(negocio.horario_cierre);
-  const router = useRouter();
+export default function NuevoNegocioForm() {
+  const [nombre, setNombre] = useState("")
+  const [email, setEmail] = useState("")
+  const [telefono, setTelefono] = useState("")
+  const [direccion, setDireccion] = useState("")
+  const [latitud, setLatitud] = useState<number | null>(null)
+  const [longitud, setLongitud] = useState<number | null>(null)
+  const [horarioApertura, setHorarioApertura] = useState("")
+  const [horarioCierre, setHorarioCierre] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch(`/api/negocios/${negocio.id}`, {
-      method: "PUT",
+    e.preventDefault()
+
+    const res = await fetch("/api/negocios", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nombre,
@@ -32,22 +33,22 @@ export default function EditarNegocioForm({ negocio }: { negocio: any }) {
         direccion,
         latitud,
         longitud,
-        horario_apertura,
-        horario_cierre,
+        horario_apertura: horarioApertura,
+        horario_cierre: horarioCierre,
       }),
-    });
+    })
 
     if (res.ok) {
-      showSuccess("Negocio actualizado correctamente");
-      setTimeout(() => router.push("/negocios"), 1500);
+      showSuccess("Negocio creado correctamente")
+      router.push("/negocios")
     } else {
-      const data = await res.json();
-      showError(data.message || "Error al actualizar el negocio");
+      const error = await res.json()
+      showError(`Error: ${error.message}`)
     }
-  };
+  }
 
   return (
-    <FormWrapper title="Editar Negocio">
+    <FormWrapper title="Crear Negocio">
       <form onSubmit={handleSubmit} className="space-y-4">
         <LabelledField label="Nombre del negocio:">
           <InputField
@@ -79,7 +80,9 @@ export default function EditarNegocioForm({ negocio }: { negocio: any }) {
 
         <LabelledField label="Ubicación:">
           {direccion && (
-            <p className="mt-2 text-sm text-gray-700">📍 Dirección actual: {direccion}</p>
+            <p className="mt-2 text-sm text-gray-700">
+              📍 Dirección actual: {direccion}
+            </p>
           )}
           <MapaUbicacion
             onUbicacionSeleccionada={(lat, lng, dir) => {
@@ -87,34 +90,33 @@ export default function EditarNegocioForm({ negocio }: { negocio: any }) {
               setLongitud(lng)
               setDireccion(dir)
             }}
-            valorInicial={latitud && longitud ? { lat: latitud, lng: longitud } : undefined}
           />
         </LabelledField>
 
         <div className="flex gap-4">
-          <LabelledField label="Horario de apertura:">
+          <LabelledField label="Apertura:">
             <input
               type="time"
-              className="w-full border p-2 rounded text-black"
-              value={horario_apertura}
+              value={horarioApertura}
               onChange={(e) => setHorarioApertura(e.target.value)}
+              className="w-full border p-2 rounded text-black"
               required
             />
           </LabelledField>
 
-          <LabelledField label="Horario de cierre:">
+          <LabelledField label="Cierre:">
             <input
               type="time"
-              className="w-full border p-2 rounded text-black"
-              value={horario_cierre}
+              value={horarioCierre}
               onChange={(e) => setHorarioCierre(e.target.value)}
+              className="w-full border p-2 rounded text-black"
               required
             />
           </LabelledField>
         </div>
 
-        <PrimaryButton type="submit">Guardar Cambios</PrimaryButton>
+        <PrimaryButton type="submit">Crear</PrimaryButton>
       </form>
     </FormWrapper>
-  );
+  )
 }

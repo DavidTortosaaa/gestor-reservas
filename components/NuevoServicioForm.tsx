@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { showSuccess, showError } from "@/lib/toast";
+import InputField from "@/components/ui/InputField";
+import LabelledField from "@/components/ui/LabelledField";
+import PrimaryButton from "@/components/ui/PrimaryButton";
 
 type NuevoServicioFormProps = {
   negocioId: string;
@@ -40,49 +43,49 @@ export default function NuevoServicioForm({ negocioId }: NuevoServicioFormProps)
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mx-auto bg-white p-6 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-black">Crear nuevo servicio</h1>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 max-w-lg mx-auto bg-white p-6 rounded shadow text-black"
+    >
+      <h1 className="text-2xl font-bold mb-4">Crear nuevo servicio</h1>
 
-      <input
-        type="text"
-        placeholder="Nombre del servicio"
-        className="w-full border p-2 rounded text-black"
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        required
-      />
+      <LabelledField label="Nombre del servicio:">
+        <InputField
+          placeholder="Nombre del servicio"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
+      </LabelledField>
 
-      <textarea
-        placeholder="Descripción (opcional)"
-        className="w-full border p-2 rounded text-black"
-        value={descripcion}
-        onChange={(e) => setDescripcion(e.target.value)}
-      />
+      <LabelledField label="Descripción (opcional):">
+        <textarea
+          placeholder="Descripción"
+          className="w-full border p-2 rounded text-black"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+        />
+      </LabelledField>
 
-      <input
-        type="number"
-        placeholder="Duración en minutos"
-        className="w-full border p-2 rounded text-black"
-        value={duracion}
-        onChange={(e) => setDuracion(Number(e.target.value))}
-        required
-      />
+      <LabelledField label="Duración (minutos):">
+        <InputField
+          type="number"
+          value={duracion.toString()}
+          onChange={(e) => setDuracion(Number(e.target.value))}
+          required
+        />
+      </LabelledField>
 
-      <input
-        type="number"
-        placeholder="Precio (€)"
-        className="w-full border p-2 rounded text-black"
-        value={precio}
-        onChange={(e) => setPrecio(Number(e.target.value))}
-        required
-      />
+      <LabelledField label="Precio (€):">
+        <InputField
+          type="number"
+          value={precio.toString()}
+          onChange={(e) => setPrecio(Number(e.target.value))}
+          required
+        />
+      </LabelledField>
 
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-      >
-        Crear Servicio
-      </button>
+      <PrimaryButton type="submit">Crear Servicio</PrimaryButton>
     </form>
   );
 }

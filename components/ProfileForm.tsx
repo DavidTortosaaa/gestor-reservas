@@ -4,6 +4,10 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import MapaUbicacion from "@/components/MapaUbicacion"
 import { showError, showSuccess } from "@/lib/toast"
+import InputField from "@/components/ui/InputField"
+import FormWrapper from "@/components/ui/FormWrapper"
+import PrimaryButton from "@/components/ui/PrimaryButton"
+import LabelledField from "@/components/ui/LabelledField"
 
 export default function PerfilForm() {
   const [nombre, setNombre] = useState("")
@@ -54,7 +58,7 @@ export default function PerfilForm() {
         password: nuevaPassword,
         latitud,
         longitud,
-        direccion
+        direccion,
       }),
     })
 
@@ -67,65 +71,51 @@ export default function PerfilForm() {
     }
   }
 
-  if (cargando) return <p className="text-center mt-8">Cargando perfil...</p>
+  if (cargando) return <p className="text-center mt-8 text-white">Cargando perfil...</p>
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow text-black">
+    <FormWrapper title="Mi Perfil">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block">
-          Nombre:
-          <input
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            className="block w-full mt-1 border p-2 rounded"
-            required
-          />
-        </label>
+        <LabelledField label="Nombre:">
+          <InputField value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Nombre" />
+        </LabelledField>
 
-        <label className="block">
-          Email:
+        <LabelledField label="Email:">
           <input
             type="text"
             value={email}
             disabled
-            className="block w-full mt-1 border p-2 rounded bg-gray-100 text-gray-500"
+            className="block w-full border p-2 rounded bg-gray-100 text-gray-500"
+            required
           />
-        </label>
+        </LabelledField>
 
-        <label className="block">
-          Teléfono:
-          <input
-            type="text"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            className="block w-full mt-1 border p-2 rounded"
-          />
-        </label>
+        <LabelledField label="Teléfono:">
+          <InputField value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" />
+        </LabelledField>
 
-        <label className="block">
-          Nueva contraseña:
-          <input
+        <LabelledField label="Nueva contraseña:">
+          <InputField
             type="password"
             value={nuevaPassword}
             onChange={(e) => setNuevaPassword(e.target.value)}
-            className="block w-full mt-1 border p-2 rounded"
             placeholder="Dejar en blanco si no cambia"
+            required
           />
-        </label>
+        </LabelledField>
 
-        <label className="block">
-          Confirmar contraseña:
-          <input
+        <LabelledField label="Confirmar contraseña:">
+          <InputField
             type="password"
             value={confirmarPassword}
             onChange={(e) => setConfirmarPassword(e.target.value)}
-            className="block w-full mt-1 border p-2 rounded"
+            placeholder="Confirmar contraseña"
+            required
           />
-        </label>
+        </LabelledField>
 
         <div>
-          Introduzca su dirección:
+          <p className="text-sm text-black mb-2">Introduce tu dirección:</p>
           {direccion && (
             <p className="mt-2 text-sm text-gray-700">📍 Dirección actual: {direccion}</p>
           )}
@@ -139,14 +129,8 @@ export default function PerfilForm() {
           />
         </div>
 
-        <div className="flex justify-between items-center mt-4">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Guardar cambios
-          </button>
-
+        <div className="flex justify-between items-center mt-6">
+          <PrimaryButton type="submit">Guardar cambios</PrimaryButton>
           <button
             type="button"
             onClick={() => router.push("/")}
@@ -156,6 +140,6 @@ export default function PerfilForm() {
           </button>
         </div>
       </form>
-    </div>
+    </FormWrapper>
   )
 }

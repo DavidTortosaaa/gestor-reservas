@@ -1,20 +1,21 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
-import { redirect } from "next/navigation"
-import { prisma } from "@/lib/prisma"
-import ServicioPublicoCard from "@/components/ServicioPublicoCard"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import ServicioPublicoCard from "@/components/ServicioPublicoCard";
+import PageWrapper from "@/components/ui/PageWrapper";
 
 type PageProps = {
   params: {
-    id: string // ID del negocio
-  }
-}
+    id: string; // ID del negocio
+  };
+};
 
 export default async function ServiciosDelNegocio({ params }: PageProps) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login")
+    redirect("/login");
   }
 
   const negocio = await prisma.negocio.findUnique({
@@ -22,19 +23,23 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
     include: {
       servicios: true,
     },
-  })
+  });
 
   if (!negocio) {
-    redirect("/reservas") // Volver si no existe
+    redirect("/reservas");
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4 ">Servicios de {negocio.nombre}</h1>
-      <p className="mb-6">{negocio.direccion}</p>
+    <PageWrapper>
+      <h1 className="text-3xl font-bold mb-2 text-white">
+        Servicios disponibles en {negocio.nombre}
+      </h1>
+      {negocio.direccion && (
+        <p className="text-white mb-6 text-sm">📍 {negocio.direccion}</p>
+      )}
 
       {negocio.servicios.length === 0 ? (
-        <p>Este negocio no tiene servicios disponibles por ahora.</p>
+        <p className="text-white">Este negocio no tiene servicios disponibles por ahora.</p>
       ) : (
         <ul className="space-y-4">
           {negocio.servicios.map((servicio) => (
@@ -46,6 +51,6 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
           ))}
         </ul>
       )}
-    </div>
-  )
+    </PageWrapper>
+  );
 }

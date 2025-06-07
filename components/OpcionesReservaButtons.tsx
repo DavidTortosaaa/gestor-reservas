@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import { useRouter } from "next/navigation";
-import { useTransition, useState } from "react";
-import { showSuccess, showError } from "@/lib/toast"; // Asegúrate que esto exista
+import { useTransition } from "react";
+import { showSuccess, showError } from "@/lib/toast";
+import PrimaryButton from "@/components/ui/PrimaryButton";
 
 type EstadoButtonProps = {
   reservaId: string;
@@ -34,20 +35,20 @@ export function OpcionesReservaButtons({ reservaId }: EstadoButtonProps) {
 
   return (
     <div className="mt-2 flex gap-2">
-      <button
-        disabled={isPending}
+      <PrimaryButton
         onClick={() => cambiarEstado("confirmar")}
-        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 disabled:opacity-50"
+        disabled={isPending}
+        className="!w-auto bg-green-600 hover:bg-green-700"
       >
         Confirmar
-      </button>
-      <button
-        disabled={isPending}
+      </PrimaryButton>
+      <PrimaryButton
         onClick={() => cambiarEstado("cancelar")}
-        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 disabled:opacity-50"
+        disabled={isPending}
+        className="!w-auto bg-red-600 hover:bg-red-700"
       >
         Cancelar
-      </button>
+      </PrimaryButton>
     </div>
   );
 }

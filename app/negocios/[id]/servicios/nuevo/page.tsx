@@ -2,20 +2,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import NuevoServicioForm from "@/components/NuevoServicioForm"; // 👈 Componente que ya te pasé
+import NuevoServicioForm from "@/components/NuevoServicioForm";
+import PageWrapper from "@/components/ui/PageWrapper";
 
 type PageProps = {
-  params: {
-    id: string; // ID del negocio
-  };
+  params: { id: string };
 };
 
 export default async function NuevoServicioPage({ params }: PageProps) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.email) {
-    redirect("/login");
-  }
+  if (!session || !session.user?.email) redirect("/login");
 
   const negocio = await prisma.negocio.findFirst({
     where: {
@@ -26,13 +23,11 @@ export default async function NuevoServicioPage({ params }: PageProps) {
     },
   });
 
-  if (!negocio) {
-    redirect("/negocios");
-  }
+  if (!negocio) redirect("/negocios");
 
   return (
-    <div>
+    <PageWrapper>
       <NuevoServicioForm negocioId={negocio.id} />
-    </div>
+    </PageWrapper>
   );
 }

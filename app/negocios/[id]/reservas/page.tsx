@@ -3,6 +3,8 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { OpcionesReservaButtons } from "@/components/OpcionesReservaButtons";
+import PageWrapper from "@/components/ui/PageWrapper";
+import ReservaAdminCard from "@/components/ReservaAdminCard";
 import Link from "next/link";
 
 type PageProps = {
@@ -12,22 +14,17 @@ type PageProps = {
 
 export default async function ReservasNegocioPage({ params, searchParams }: PageProps) {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user?.email) redirect("/login");
+  if (!session?.user?.email) redirect("/login");
 
   const estadoFiltro = searchParams?.estado;
   const fechaFiltro = searchParams?.fecha;
 
-  // Limpiar reservas pasadas con estado pendiente o cancelada
   await prisma.reserva.deleteMany({
     where: {
       fechaHora: { lt: new Date() },
       estado: { in: ["pendiente", "cancelada"] },
       servicio: {
-        negocio: {
-          propietario: {
-            email: session.user.email,
-          },
-        },
+        negocio: { propietario: { email: session.user.email } },
       },
     },
   });
@@ -52,12 +49,8 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
                   }
                 : {}),
             },
-            include: {
-              cliente: true,
-            },
-            orderBy: {
-              fechaHora: "desc",
-            },
+            include: { cliente: true },
+            orderBy: { fechaHora: "desc" },
           },
         },
       },
@@ -81,12 +74,13 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
   }, {} as Record<string, typeof reservas>);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Reservas de {negocio.nombre}</h1>
+    <PageWrapper>
+      <h1 className="text-3xl font-bold text-white mb-6">Reservas de {negocio.nombre}</h1>
 
-      <div className="mb-6 p-4 bg-gray-100 rounded shadow flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <form method="GET" className="flex flex-col sm:flex-row items-center gap-2 text-black">
-          <label htmlFor="fecha">Filtrar por fecha:</label>
+      {/* Filtros */}
+      <div className="mb-6 bg-white rounded-lg shadow p-4 text-black space-y-4">
+        <form method="GET" className="flex flex-col sm:flex-row items-center gap-3">
+          <label htmlFor="fecha" className="font-medium">Filtrar por fecha:</label>
           <input
             id="fecha"
             type="date"
@@ -96,84 +90,55 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
           />
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded shadow"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Filtrar
           </button>
+          <Link
+            href={`/negocios/${negocio.id}/reservas`}
+            className="text-blue-600 underline text-sm ml-auto"
+          >
+            Limpiar filtros
+          </Link>
         </form>
 
-        <Link
-          href={`/negocios/${negocio.id}/reservas`}
-          className="text-blue-600 hover:text-blue-800 underline text-sm"
-        >
-          Limpiar filtros
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="font-semibold">Filtrar por estado:</span>
+          {["pendiente", "confirmada", "cancelada"].map((estado) => (
+            <Link
+              key={estado}
+              href={`/negocios/${negocio.id}/reservas?estado=${estado}`}
+              className={`px-3 py-1 rounded ${
+                estadoFiltro === estado
+                  ? "bg-blue-600 text-white"
+                  : "text-blue-600 underline hover:text-blue-800"
+              }`}
+            >
+              {estado.charAt(0).toUpperCase() + estado.slice(1)}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="mb-6 p-4 bg-gray-100 rounded shadow flex flex-wrap items-center gap-2 text-sm">
-        <span className="font-semibold text-gray-800 mr-2">Filtrar por estado:</span>
-        <Link
-          href={`/negocios/${negocio.id}/reservas`}
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Todos
-        </Link>
-        <Link
-          href={`/negocios/${negocio.id}/reservas?estado=pendiente`}
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Pendiente
-        </Link>
-        <Link
-          href={`/negocios/${negocio.id}/reservas?estado=confirmada`}
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Confirmada
-        </Link>
-        <Link
-          href={`/negocios/${negocio.id}/reservas?estado=cancelada`}
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Cancelada
-        </Link>
-      </div>
-
+      {/* Resultados */}
       {reservas.length === 0 ? (
-        <p>No hay reservas{estadoFiltro ? ` con estado "${estadoFiltro}"` : ""}.</p>
+        <p className="text-white">
+          No hay reservas{estadoFiltro ? ` con estado "${estadoFiltro}"` : ""}.
+        </p>
       ) : (
         Object.entries(reservasPorDia).map(([fecha, reservasDelDia]) => (
-          <div key={fecha} className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">
+          <div key={fecha} className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-3">
               {new Date(fecha).toLocaleDateString()}
             </h2>
             <ul className="space-y-4">
               {reservasDelDia.map((reserva) => (
-                <li key={reserva.id} className="bg-white p-4 rounded shadow text-black">
-                  <p>
-                    <strong>Servicio:</strong> {reserva.servicioNombre}
-                  </p>
-                  <p>
-                    <strong>Cliente:</strong> {reserva.cliente?.nombre || "Desconocido"}
-                  </p>
-                  <p>
-                    <strong>Hora:</strong>{" "}
-                    {new Date(reserva.fechaHora).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                  <p>
-                    <strong>Estado:</strong> {reserva.estado}
-                  </p>
-                  {reserva.estado === "pendiente" && (
-                    <OpcionesReservaButtons reservaId={reserva.id} />
-                  )}
-                </li>
+                <ReservaAdminCard key={reserva.id} reserva={reserva} />
               ))}
             </ul>
           </div>
         ))
       )}
-    </div>
+    </PageWrapper>
   );
 }

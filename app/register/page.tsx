@@ -4,6 +4,11 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import MapaUbicacion from "@/components/MapaUbicacion"
 import { showSuccess, showError } from "@/lib/toast"
+import InputField from "@/components/ui/InputField"
+import FormWrapper from "@/components/ui/FormWrapper"
+import PrimaryButton from "@/components/ui/PrimaryButton"
+import LabelledField from "@/components/ui/LabelledField"
+import PageWrapper from "@/components/ui/PageWrapper" // 👈 Importar
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -21,7 +26,15 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, email, password, telefono, latitud, longitud, direccion }),
+      body: JSON.stringify({
+        nombre,
+        email,
+        password,
+        telefono,
+        latitud,
+        longitud,
+        direccion,
+      }),
     })
 
     const data = await res.json()
@@ -35,57 +48,62 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white p-6 rounded shadow text-black">
-      <h1 className="text-2xl font-bold mb-4">Crear cuenta</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="tel"
-          placeholder="Teléfono (opcional)"
-          value={telefono}
-          onChange={(e) => setTelefono(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
+    <PageWrapper> {/* 👈 Envolvemos todo */}
+      <FormWrapper title="Crear cuenta">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <LabelledField label="Nombre:">
+            <InputField
+              placeholder="Nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              required
+            />
+          </LabelledField>
 
-        {direccion && (
-          <p className="text-sm text-gray-700">📍 Dirección: {direccion}</p>
-        )}
+          <LabelledField label="Correo electrónico:">
+            <InputField
+              type="email"
+              placeholder="Correo electrónico"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </LabelledField>
 
-        <MapaUbicacion
-          onUbicacionSeleccionada={(lat, lng, dir) => {
-            setLatitud(lat)
-            setLongitud(lng)
-            setDireccion(dir)
-          }}
-        />
+          <LabelledField label="Contraseña:">
+            <InputField
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </LabelledField>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Registrarse
-        </button>
-      </form>
-    </div>
+          <LabelledField label="Teléfono (opcional):">
+            <InputField
+              type="tel"
+              placeholder="Teléfono"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+            />
+          </LabelledField>
+
+          {direccion && (
+            <p className="text-sm text-gray-700">📍 Dirección: {direccion}</p>
+          )}
+
+          <MapaUbicacion
+            onUbicacionSeleccionada={(lat, lng, dir) => {
+              setLatitud(lat)
+              setLongitud(lng)
+              setDireccion(dir)
+            }}
+          />
+
+          <PrimaryButton type="submit">Registrarse</PrimaryButton>
+        </form>
+      </FormWrapper>
+    </PageWrapper>
   )
 }

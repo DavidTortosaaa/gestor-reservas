@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import NegociosCliente from "@/components/NegociosCliente";
+import PageWrapper from "@/components/ui/PageWrapper";
 
 type PageProps = {
   searchParams?: {
@@ -13,7 +14,7 @@ type PageProps = {
 export default async function ReservasPage({ searchParams }: PageProps) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session || !session.user?.email) {
     redirect("/login");
   }
 
@@ -30,6 +31,8 @@ export default async function ReservasPage({ searchParams }: PageProps) {
   });
 
   return (
-    <NegociosCliente negocios={negocios} filtroInicial={filtro} />
+    <PageWrapper>
+      <NegociosCliente negocios={negocios} filtroInicial={filtro} />
+    </PageWrapper>
   );
 }

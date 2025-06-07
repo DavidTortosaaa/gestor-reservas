@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import NegocioPublicoCard from "@/components/NegocioPublicoCard";
 
-export default function NegociosCliente({ negocios, filtroInicial }: { negocios: any[], filtroInicial: string }) {
+export default function NegociosCliente({
+  negocios,
+  filtroInicial,
+}: {
+  negocios: any[];
+  filtroInicial: string;
+}) {
   const [buscar, setBuscar] = useState(filtroInicial || "");
   const [mostrarCercanos, setMostrarCercanos] = useState(false);
   const [negociosCercanos, setNegociosCercanos] = useState<any[]>([]);
@@ -31,14 +37,14 @@ export default function NegociosCliente({ negocios, filtroInicial }: { negocios:
     n.nombre.toLowerCase().includes(buscar.toLowerCase())
   );
 
-   return (
-    <div className="text-black">
-      <h1 className="text-2xl font-bold mb-6 text-white">Reservar un Servicio</h1>
+  return (
+    <div className="max-w-5xl mx-auto px-4 text-black">
+      <h1 className="text-3xl font-bold mb-6 text-white">Reservar un Servicio</h1>
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
         <Link
           href="/reservas/mis-reservas"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
         >
           Ver Mis Reservas
         </Link>
@@ -72,7 +78,7 @@ export default function NegociosCliente({ negocios, filtroInicial }: { negocios:
       </form>
 
       {mostrarCercanos && loadingCercanos ? (
-        <p>Cargando negocios cercanos...</p>
+        <p className="text-white">Cargando negocios cercanos...</p>
       ) : negociosFiltrados.length === 0 ? (
         <p className="text-red-600">
           {mostrarCercanos
@@ -82,10 +88,10 @@ export default function NegociosCliente({ negocios, filtroInicial }: { negocios:
       ) : (
         <ul className="space-y-4">
           {negociosFiltrados.map((negocio) => (
-            <li key={negocio.id} className="bg-white p-4 rounded shadow text-black">
+            <li key={negocio.id}>
               <NegocioPublicoCard negocio={negocio} />
               {mostrarCercanos && negocio.distancia !== undefined && (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-white mt-1 pl-1">
                   A aproximadamente {negocio.distancia.toFixed(1)} km de tu ubicación.
                 </p>
               )}

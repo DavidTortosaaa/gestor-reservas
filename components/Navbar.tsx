@@ -1,57 +1,48 @@
 'use client'
 
+
 import Link from 'next/link'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession} from 'next-auth/react'
+import LogoutButton from './LogoutButton'
 
 export default function Navbar() {
-   // Obtiene el estado de la sesión y los datos del usuario autenticado
   const { data: session, status } = useSession()
 
   return (
-    <nav className="w-full bg-white shadow-md px-6 py-4 flex justify-between items-center">
-      <Link href="/" className="text-xl font-bold text-blue-600">
+    <nav className="w-full bg-white shadow-md px-6 py-6 flex justify-between items-center">
+      {/* Logo / inicio */}
+      <Link href="/" className="text-2xl font-bold text-blue-600">
         Gestor Reservas
       </Link>
 
-      {/* Opciones de navegación */}
-      <div className="space-x-4 flex items-center">
-        
-        <Link href="/negocios" className="text-gray-700 hover:text-blue-600">
+      {/* Enlaces de navegación */}
+      <div className="space-x-6 flex items-center text-lg">
+        <Link href="/negocios" className="text-gray-700 hover:text-blue-600 transition-colors">
           Mis negocios
         </Link>
-        <Link href="/reservas" className="text-gray-700 hover:text-blue-600">
+        <Link href="/reservas" className="text-gray-700 hover:text-blue-600 transition-colors">
           Reservar
         </Link>
 
-        {/* Opciones según el estado de la sesión */}
         {status === 'loading' ? (
-          <p className="text-gray-500">Cargando...</p>
+          <span className="text-gray-500">Cargando...</span>
         ) : session ? (
-          // Opciones para usuarios autenticados
           <>
-            <Link href="/reservas/mis-reservas" className="text-gray-700 hover:text-blue-600">
+            <Link href="/reservas/mis-reservas" className="text-gray-700 hover:text-blue-600 transition-colors">
               Mis Reservas
             </Link>
-            <Link href="/perfil" className="text-gray-700 hover:text-blue-600">
+            <Link href="/perfil" className="text-gray-700 hover:text-blue-600 transition-colors">
               Mi Perfil
             </Link>
-            <span className="text-sm text-gray-500">
-              {session.user?.email}
-            </span>
-            <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-red-600 hover:text-red-800"
-            >
-              Cerrar sesión
-            </button>
+            <span className="text-sm text-gray-500">{session.user?.email}</span>
+            <LogoutButton />
           </>
         ) : (
-          // Opciones para usuarios no autenticados
           <>
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-blue-600 hover:underline transition-colors">
               Iniciar sesión
             </Link>
-            <Link href="/register" className="text-blue-600 hover:underline">
+            <Link href="/register" className="text-blue-600 hover:underline transition-colors">
               Registrarse
             </Link>
           </>

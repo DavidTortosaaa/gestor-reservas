@@ -3,8 +3,8 @@ import { signOut } from "next-auth/react"
 export default function LogoutButton() {
   return (
     <button
-      onClick={() => signOut({ callbackUrl: "/" })} // Redirige a la página de inicio después de cerrar sesión
-      className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
+      onClick={() => signOut({ callbackUrl: "/" })}
+      className="text-red-600 hover:text-red-800 transition-colors"
     >
       Cerrar sesión
     </button>

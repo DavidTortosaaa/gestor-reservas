@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import EditarNegocioForm from "@/components/EditarNegocioForm";
+import PageWrapper from "@/components/ui/PageWrapper"; // 👈
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,6 @@ type PageProps = {
     id: string;
   };
 };
-
 
 export default async function EditarNegocioPage({ params }: PageProps) {
   const { id: negocioId } = params;
@@ -36,9 +36,8 @@ export default async function EditarNegocioPage({ params }: PageProps) {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Editar Negocio</h1>
+    <PageWrapper>
       <EditarNegocioForm negocio={negocio} />
-    </div>
+    </PageWrapper>
   );
 }

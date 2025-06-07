@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import EditarServicioForm from "@/components/EditarServicioForm";
+import PageWrapper from "@/components/ui/PageWrapper";
 
 type PageProps = {
   params: {
@@ -28,14 +29,15 @@ export default async function EditarServicioPage({ params }: PageProps) {
         },
       },
     },
-    include: {
-      negocio: true,
-    },
   });
 
   if (!servicio) {
     redirect("/negocios");
   }
 
-  return <EditarServicioForm servicio={servicio} />;
+  return (
+    <PageWrapper>
+      <EditarServicioForm servicio={servicio} />
+    </PageWrapper>
+  );
 }
