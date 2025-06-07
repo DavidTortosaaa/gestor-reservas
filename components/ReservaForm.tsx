@@ -121,8 +121,9 @@ export default function ReservaForm({ servicioId, duracion, apertura, cierre }: 
       return;
     }
 
-    const fechaISO = fecha.toISOString().split("T")[0];
-    const fechaHora = new Date(`${fechaISO}T${hora}:00`);
+    const [horaH, horaM] = hora.split(":").map(Number);
+    const fechaHora = new Date(fecha!);
+    fechaHora.setHours(horaH, horaM, 0, 0);
 
     const res = await fetch("/api/reservas", {
       method: "POST",

@@ -49,7 +49,17 @@ export async function POST(req: Request) {
      * Valida que la fecha de la reserva no sea en fines de semana ni en el pasado.
      */
     const fechaReserva = new Date(fechaHora);
-    const diaSemana = fechaReserva.getDay();
+
+    const fechaLocal = new Date(
+      fechaReserva.getFullYear(),
+      fechaReserva.getMonth(),
+      fechaReserva.getDate(),
+      fechaReserva.getHours(),
+      fechaReserva.getMinutes(),
+      0
+    );
+
+    const diaSemana = fechaLocal.getDay();
     if (diaSemana === 0 || diaSemana === 6) {
       return NextResponse.json(
         { message: "No se pueden hacer reservas en fines de semana" },
@@ -58,7 +68,7 @@ export async function POST(req: Request) {
     }
 
     const ahora = new Date();
-    if (fechaReserva <= ahora) {
+    if (fechaLocal <= ahora) {
       return NextResponse.json({ message: "No se puede crear una reserva en el pasado" }, { status: 400 });
     }
 

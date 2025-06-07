@@ -9,7 +9,7 @@ import ReservaCard from "@/components/ReservaCard";
  * Página MisReservasPage
  * 
  * Esta página muestra las reservas realizadas por el usuario autenticado.
- * Divide las reservas en futuras y pasadas para facilitar la navegación.
+ * Divide las reservas en futuras y pasadas, agrupándolas por negocio.
  * Si el usuario no está autenticado, redirige a la página de inicio de sesión.
  */
 export default async function MisReservasPage() {
@@ -60,47 +60,82 @@ export default async function MisReservasPage() {
   });
 
   /**
-   * Divide las reservas en futuras y pasadas según la fecha y hora actual.
+   * Agrupa las reservas por negocio y las divide en futuras y pasadas.
    */
-  const futuras = reservas.filter((r) => r.fechaHora > ahora);
-  const pasadas = reservas.filter((r) => r.fechaHora <= ahora);
+  const reservasPorNegocio = reservas.reduce((acc, reserva) => {
+    const negocioId = reserva.servicio.negocio.id;
+    const negocioNombre = reserva.servicio.negocio.nombre;
+
+    if (!acc[negocioId]) {
+      acc[negocioId] = {
+        nombre: negocioNombre,
+        futuras: [],
+        pasadas: [],
+      };
+    }
+
+    if (reserva.fechaHora > ahora) {
+      acc[negocioId].futuras.push(reserva);
+    } else {
+      acc[negocioId].pasadas.push(reserva);
+    }
+
+    return acc;
+  }, {} as Record<string, { nombre: string; futuras: typeof reservas; pasadas: typeof reservas }>);
+
+  /**
+   * Ordena los negocios alfabéticamente por nombre.
+   */
+  const gruposOrdenados = Object.entries(reservasPorNegocio).sort((a, b) =>
+    a[1].nombre.localeCompare(b[1].nombre)
+  );
 
   /**
    * Renderiza la página de "Mis Reservas".
    * 
-   * Incluye secciones para las reservas futuras y el historial de reservas pasadas.
+   * Incluye secciones para las reservas futuras y el historial de reservas pasadas, agrupadas por negocio.
    */
   return (
     <PageWrapper>
       <h1 className="text-3xl font-bold mb-6 text-white">Mis reservas</h1>
 
-      {/* Reservas futuras */}
-      <section className="mb-10 text-white">
-        <h2 className="text-xl font-semibold mb-4">Próximas Reservas</h2>
-        {futuras.length === 0 ? (
-          <p>No tienes reservas futuras.</p>
-        ) : (
-          <ul className="space-y-4">
-            {futuras.map((reserva) => (
-              <ReservaCard key={reserva.id} reserva={reserva} />
-            ))}
-          </ul>
-        )}
-      </section>
+      {gruposOrdenados.map(([negocioId, grupo]) => (
+        <div key={negocioId} className="mb-10 text-white">
+          <h2 className="text-2xl font-semibold mb-4">{grupo.nombre}</h2>
 
-      {/* Historial */}
-      <section className="mb-10 text-white">
-        <h2 className="text-xl font-semibold mb-4">Historial de Reservas</h2>
-        {pasadas.length === 0 ? (
-          <p>No tienes reservas pasadas.</p>
-        ) : (
-          <ul className="space-y-4">
-            {pasadas.map((reserva) => (
-              <ReservaCard key={reserva.id} reserva={reserva} esPasada />
-            ))}
-          </ul>
-        )}
-      </section>
+          {/* Futuras */}
+          <section className="mb-6">
+            <h3 className="text-xl font-semibold mb-2">Próximas Reservas</h3>
+            {grupo.futuras.length === 0 ? (
+              <p>No tienes reservas futuras en este negocio.</p>
+            ) : (
+              <ul className="space-y-4">
+                {grupo.futuras
+                  .sort((a, b) => a.fechaHora.getTime() - b.fechaHora.getTime())
+                  .map((reserva) => (
+                    <ReservaCard key={reserva.id} reserva={reserva} />
+                  ))}
+              </ul>
+            )}
+          </section>
+
+          {/* Pasadas */}
+          <section>
+            <h3 className="text-xl font-semibold mb-2">Historial</h3>
+            {grupo.pasadas.length === 0 ? (
+              <p>No tienes reservas pasadas en este negocio.</p>
+            ) : (
+              <ul className="space-y-4">
+                {grupo.pasadas
+                  .sort((a, b) => a.fechaHora.getTime() - b.fechaHora.getTime())
+                  .map((reserva) => (
+                    <ReservaCard key={reserva.id} reserva={reserva} esPasada />
+                  ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      ))}
     </PageWrapper>
   );
 }

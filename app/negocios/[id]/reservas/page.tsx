@@ -93,6 +93,10 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
     }))
   );
 
+  //  Ordenar todas las reservas por fecha y hora (ascendente)
+  reservas.sort((a, b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
+
+  //  Agrupar por día ya ordenado
   const reservasPorDia = reservas.reduce((acc, reserva) => {
     const fechaKey = new Date(reserva.fechaHora).toISOString().split("T")[0];
     if (!acc[fechaKey]) acc[fechaKey] = [];
