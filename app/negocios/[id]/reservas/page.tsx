@@ -24,13 +24,12 @@ export default async function ReservasNegocioPage({ params, searchParams }: Prop
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
-  const { id } = await params;
-  const { estado: estadoFiltro, fecha: fechaFiltro } = (await searchParams) || {};
 
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-
+  const { id } = await params;
+  const { estado: estadoFiltro, fecha: fechaFiltro } = (await searchParams) || {};
   /**
    * Elimina reservas pasadas que están pendientes o canceladas.
    * 

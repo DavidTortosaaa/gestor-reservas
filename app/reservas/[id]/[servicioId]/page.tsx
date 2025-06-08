@@ -25,7 +25,6 @@ export default async function ReservaServicioPage({ params }: Props) {
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
-  const { id: negocioId, servicioId } = await params;
   const session = await getServerSession(authOptions);
 
   /**
@@ -34,6 +33,8 @@ export default async function ReservaServicioPage({ params }: Props) {
   if (!session?.user?.email) {
     redirect("/login");
   }
+
+  const { id: negocioId, servicioId } = await params;
 
   /**
    * Obtiene los datos del servicio desde la base de datos.

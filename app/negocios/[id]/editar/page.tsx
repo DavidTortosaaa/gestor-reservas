@@ -20,7 +20,7 @@ interface Props{
  * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
  */
 export default async function EditarNegocioPage({ params }:Props) {
-  const { id: negocioId } = await params;
+  
 
   /**
    * Obtiene la sesión del usuario desde el servidor.
@@ -35,6 +35,7 @@ export default async function EditarNegocioPage({ params }:Props) {
   if (!session?.user?.email) {
     redirect("/login");
   }
+  const { id: negocioId } = await params;
 
   /**
    * Obtiene los datos del negocio desde la base de datos.

@@ -27,13 +27,14 @@ export default async function EditarServicioPage({ params }: Props) {
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
   const session = await getServerSession(authOptions);
-  const { id: negocioId, servicioId } = await params;
+  
   /**
    * Redirige al usuario a la página de inicio de sesión si no está autenticado.
    */
   if (!session?.user?.email) {
     redirect("/login");
   }
+  const { id: negocioId, servicioId } = await params;
 
   /**
    * Obtiene los datos del servicio desde la base de datos.

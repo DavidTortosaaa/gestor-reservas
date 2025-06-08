@@ -25,7 +25,7 @@ export default async function ServiciosPage({ params }: Props) {
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
-  const { id } = await params;
+  
   const session = await getServerSession(authOptions);
 
   /**
@@ -34,6 +34,7 @@ export default async function ServiciosPage({ params }: Props) {
   if (!session?.user?.email) {
     redirect("/login");
   }
+  const { id } = await params;
 
   /**
    * Obtiene los datos del negocio desde la base de datos.

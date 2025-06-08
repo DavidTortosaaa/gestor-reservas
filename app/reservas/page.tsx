@@ -5,10 +5,10 @@ import { prisma } from "@/lib/prisma";
 import NegociosCliente from "@/components/NegociosCliente";
 import PageWrapper from "@/components/ui/PageWrapper";
 
-type PageProps = {
-  searchParams?: {
+interface Props {
+  searchParams?: Promise<{
     buscar?: string; // Parámetro de búsqueda para filtrar negocios por nombre
-  };
+  }>;
 };
 
 /**
@@ -18,7 +18,7 @@ type PageProps = {
  * Permite filtrar negocios por nombre utilizando un parámetro de búsqueda.
  * Si el usuario no está autenticado, redirige a la página de inicio de sesión.
  */
-export default async function ReservasPage({ searchParams }: PageProps) {
+export default async function ReservasPage({ searchParams }: Props) {
   /**
    * Obtiene la sesión del usuario desde el servidor.
    * 
@@ -39,7 +39,8 @@ export default async function ReservasPage({ searchParams }: PageProps) {
    * Utiliza Prisma para buscar negocios cuyo nombre coincida con el filtro de búsqueda.
    * Ordena los negocios por nombre en orden ascendente.
    */
-  const filtro = searchParams?.buscar?.toLowerCase() || "";
+  const { buscar } = (await searchParams) || {};
+  const filtro = buscar?.toLowerCase() || "";
 
   const negocios = await prisma.negocio.findMany({
     where: {
