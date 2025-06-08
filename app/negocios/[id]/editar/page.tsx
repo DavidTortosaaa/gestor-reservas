@@ -6,11 +6,6 @@ import EditarNegocioForm from "@/components/EditarNegocioForm";
 import PageWrapper from "@/components/ui/PageWrapper";
 
 
-type PageProps = {
-  params: {
-    id: string; // ID único del negocio que se desea editar
-  };
-};
 
 /**
  * Página EditarNegocioPage
@@ -18,7 +13,7 @@ type PageProps = {
  * Esta página permite al usuario autenticado editar un negocio existente.
  * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
  */
-export default async function EditarNegocioPage({ params }: PageProps) {
+export default async function EditarNegocioPage({ params }:{ params: { id: string } }) {
   const { id: negocioId } = params;
 
   /**
