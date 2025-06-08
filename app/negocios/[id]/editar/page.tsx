@@ -7,10 +7,10 @@ import PageWrapper from "@/components/ui/PageWrapper";
 
 
 
-interface PageProps{
-  params: {
+interface Props{
+  params: Promise <{
     id: string; // ID único del negocio que se desea editar
-  };
+  }>;
 };
 
 /**
@@ -19,8 +19,8 @@ interface PageProps{
  * Esta página permite al usuario autenticado editar un negocio existente.
  * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
  */
-export default async function EditarNegocioPage({ params }:PageProps) {
-  const { id: negocioId } = params;
+export default async function EditarNegocioPage({ params }:Props) {
+  const { id: negocioId } = await params;
 
   /**
    * Obtiene la sesión del usuario desde el servidor.
