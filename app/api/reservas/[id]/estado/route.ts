@@ -5,14 +5,23 @@ import { prisma } from "@/lib/prisma";
 import { enviarCorreo } from "@/lib/mailer";
 
 /**
- * Endpoint para confirmar o cancelar una reserva.
+ * Utilidad para extraer el ID de la reserva desde la URL.
  * 
- * Este endpoint permite al propietario de un negocio confirmar o cancelar una reserva.
+ * @param req - Solicitud HTTP.
+ * @returns El ID de la reserva si está presente en la URL, o `null` si no se encuentra.
  */
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+function extraerIdDesdeUrl(req: Request): string | null {
+  const match = req.url.match(/\/api\/reservas\/([^/]+)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Endpoint para que el propietario confirme o cancele una reserva.
+ * 
+ * Este endpoint permite al propietario de un negocio cambiar el estado de una reserva.
+ * Envía una notificación por correo al cliente sobre el cambio de estado.
+ */
+export async function POST(req: Request) {
   /**
    * Obtiene la sesión del usuario autenticado.
    * 
@@ -24,10 +33,19 @@ export async function POST(
   }
 
   /**
-   * Extrae la acción enviada en el formulario.
+   * Extrae el ID de la reserva desde la URL.
    * 
-   * @param req - Solicitud HTTP con los datos del formulario.
-   * @returns La acción a realizar: "confirmar" o "cancelar".
+   * @returns Una respuesta de error si el ID no es válido.
+   */
+  const id = extraerIdDesdeUrl(req);
+  if (!id) {
+    return NextResponse.json({ message: "ID inválido en la URL" }, { status: 400 });
+  }
+
+  /**
+   * Obtiene los datos enviados en la solicitud.
+   * 
+   * @returns La acción a realizar (confirmar o cancelar).
    */
   const formData = await req.formData();
   const accion = formData.get("accion");
@@ -38,20 +56,16 @@ export async function POST(
 
   /**
    * Busca al usuario autenticado en la base de datos.
-   * 
-   * @returns El objeto del usuario o una respuesta de error si no se encuentra.
    */
   const user = await prisma.usuario.findUnique({
     where: { email: session.user.email },
   });
 
   /**
-   * Busca la reserva en la base de datos.
-   * 
-   * @returns El objeto de la reserva o una respuesta de error si no se encuentra.
+   * Busca la reserva en la base de datos e incluye información del cliente y del negocio.
    */
   const reserva = await prisma.reserva.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       cliente: true,
       servicio: {
@@ -62,26 +76,29 @@ export async function POST(
     },
   });
 
+  /**
+   * Verifica que la reserva exista y que el usuario autenticado sea el propietario del negocio.
+   */
   if (!reserva || reserva.servicio.negocio.propietarioId !== user?.id) {
     return NextResponse.json({ message: "No autorizado para esta acción" }, { status: 403 });
   }
 
   /**
-   * Actualiza el estado de la reserva.
+   * Actualiza el estado de la reserva en la base de datos.
    * 
-   * @returns El objeto de la reserva con el estado actualizado.
+   * @returns El nuevo estado de la reserva.
    */
   const nuevoEstado = accion === "confirmar" ? "confirmada" : "cancelada";
 
   const nuevaReserva = await prisma.reserva.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       estado: nuevoEstado,
     },
   });
 
   /**
-   * Envía una notificación por correo al cliente.
+   * Envía una notificación por correo al cliente sobre el cambio de estado.
    */
   if (reserva.cliente?.email) {
     const asunto =
@@ -105,11 +122,6 @@ export async function POST(
     });
   }
 
-  /**
-   * Devuelve una respuesta HTTP con el estado actualizado.
-   * 
-   * @returns Una respuesta JSON con el nuevo estado de la reserva.
-   */
   return NextResponse.json({
     message: "Estado actualizado",
     estado: nuevaReserva.estado,
@@ -119,12 +131,9 @@ export async function POST(
 /**
  * Endpoint para que el cliente cancele su propia reserva.
  * 
- * Este endpoint permite a los clientes cancelar sus reservas futuras.
+ * Este endpoint permite al cliente cancelar una reserva futura.
  */
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: Request) {
   /**
    * Obtiene la sesión del usuario autenticado.
    * 
@@ -136,9 +145,18 @@ export async function PATCH(
   }
 
   /**
-   * Extrae el nuevo estado enviado en la solicitud.
+   * Extrae el ID de la reserva desde la URL.
    * 
-   * @param req - Solicitud HTTP con los datos del estado.
+   * @returns Una respuesta de error si el ID no es válido.
+   */
+  const id = extraerIdDesdeUrl(req);
+  if (!id) {
+    return NextResponse.json({ message: "ID inválido en la URL" }, { status: 400 });
+  }
+
+  /**
+   * Obtiene los datos enviados en la solicitud.
+   * 
    * @returns El nuevo estado de la reserva.
    */
   const { nuevoEstado } = await req.json();
@@ -148,8 +166,6 @@ export async function PATCH(
 
   /**
    * Busca al usuario autenticado en la base de datos.
-   * 
-   * @returns El objeto del usuario o una respuesta de error si no se encuentra.
    */
   const usuario = await prisma.usuario.findUnique({
     where: { email: session.user.email },
@@ -157,38 +173,34 @@ export async function PATCH(
 
   /**
    * Busca la reserva en la base de datos.
-   * 
-   * @returns El objeto de la reserva o una respuesta de error si no se encuentra.
    */
   const reserva = await prisma.reserva.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
+  /**
+   * Verifica que la reserva exista y que el usuario autenticado sea el cliente.
+   */
   if (!reserva || reserva.clienteId !== usuario?.id) {
     return NextResponse.json({ message: "No autorizado para cancelar esta reserva" }, { status: 403 });
   }
 
   /**
-   * Valida que la reserva no sea en el pasado.
+   * Verifica que la reserva no sea pasada.
    */
   if (new Date(reserva.fechaHora) <= new Date()) {
     return NextResponse.json({ message: "No se puede cancelar una reserva pasada" }, { status: 400 });
   }
 
   /**
-   * Actualiza el estado de la reserva a "cancelada".
+   * Actualiza el estado de la reserva en la base de datos.
    * 
-   * @returns El objeto de la reserva con el estado actualizado.
+   * @returns La reserva actualizada.
    */
   const actualizada = await prisma.reserva.update({
-    where: { id: params.id },
+    where: { id },
     data: { estado: "cancelada" },
   });
 
-  /**
-   * Devuelve una respuesta HTTP con la reserva cancelada.
-   * 
-   * @returns Una respuesta JSON con el objeto de la reserva actualizada.
-   */
   return NextResponse.json({ message: "Reserva cancelada", reserva: actualizada });
 }
