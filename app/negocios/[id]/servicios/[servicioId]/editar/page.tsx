@@ -5,12 +5,14 @@ import { redirect } from "next/navigation";
 import EditarServicioForm from "@/components/EditarServicioForm";
 import PageWrapper from "@/components/ui/PageWrapper";
 
-type PageProps = {
-  params: {
-    id: string; // negocioId
+interface Props {
+  params: Promise<{
+    id: string;         // negocioId
     servicioId: string; // servicioId
-  };
-};
+  }>;
+}
+
+
 
 /**
  * Página EditarServicioPage
@@ -18,14 +20,14 @@ type PageProps = {
  * Esta página permite al usuario autenticado editar un servicio existente asociado a un negocio específico.
  * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
  */
-export default async function EditarServicioPage({ params }: PageProps) {
+export default async function EditarServicioPage({ params }: Props) {
   /**
    * Obtiene la sesión del usuario desde el servidor.
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
   const session = await getServerSession(authOptions);
-
+  const { id: negocioId, servicioId } = await params;
   /**
    * Redirige al usuario a la página de inicio de sesión si no está autenticado.
    */
@@ -40,9 +42,9 @@ export default async function EditarServicioPage({ params }: PageProps) {
    */
   const servicio = await prisma.servicio.findFirst({
     where: {
-      id: params.servicioId,
+      id: servicioId,
       negocio: {
-        id: params.id,
+        id: negocioId,
         propietario: {
           email: session.user.email,
         },

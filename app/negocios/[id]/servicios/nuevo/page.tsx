@@ -5,8 +5,10 @@ import { redirect } from "next/navigation";
 import NuevoServicioForm from "@/components/NuevoServicioForm";
 import PageWrapper from "@/components/ui/PageWrapper";
 
-type PageProps = {
-  params: { id: string }; // ID único del negocio
+interface Props{
+  params: Promise <{
+    id: string; // ID único del negocio 
+  }>;
 };
 
 /**
@@ -15,12 +17,13 @@ type PageProps = {
  * Esta página permite al usuario autenticado crear un nuevo servicio asociado a un negocio específico.
  * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
  */
-export default async function NuevoServicioPage({ params }: PageProps) {
+export default async function NuevoServicioPage({ params }: Props) {
   /**
    * Obtiene la sesión del usuario desde el servidor.
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   /**
@@ -35,7 +38,7 @@ export default async function NuevoServicioPage({ params }: PageProps) {
    */
   const negocio = await prisma.negocio.findFirst({
     where: {
-      id: params.id,
+      id,
       propietario: {
         email: session.user.email,
       },

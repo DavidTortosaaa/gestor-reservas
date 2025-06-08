@@ -5,12 +5,12 @@ import { redirect } from "next/navigation";
 import ReservaForm from "@/components/ReservaForm";
 import PageWrapper from "@/components/ui/PageWrapper";
 
-type PageProps = {
-  params: {
-    id: string;            // ID único del negocio
-    servicioId: string;    // ID único del servicio
-  };
-};
+interface Props {
+  params: Promise<{
+    id: string;         // negocioId
+    servicioId: string; // servicioId
+  }>;
+}
 
 /**
  * Página ReservaServicioPage
@@ -19,12 +19,13 @@ type PageProps = {
  * Si el usuario no está autenticado, redirige a la página de inicio de sesión.
  * Si el servicio o negocio no existe, redirige a la página de reservas.
  */
-export default async function ReservaServicioPage({ params }: PageProps) {
+export default async function ReservaServicioPage({ params }: Props) {
   /**
    * Obtiene la sesión del usuario desde el servidor.
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
+  const { id: negocioId, servicioId } = await params;
   const session = await getServerSession(authOptions);
 
   /**
@@ -42,8 +43,8 @@ export default async function ReservaServicioPage({ params }: PageProps) {
    */
   const servicio = await prisma.servicio.findFirst({
     where: {
-      id: params.servicioId,
-      negocioId: params.id,
+      id: servicioId,
+      negocioId: negocioId,
     },
     include: {
       negocio: true,

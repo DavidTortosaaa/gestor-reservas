@@ -6,9 +6,9 @@ import PageWrapper from "@/components/ui/PageWrapper";
 import ReservaAdminCard from "@/components/ReservaAdminCard";
 import Link from "next/link";
 
-type PageProps = {
-  params: { id: string }; // ID único del negocio
-  searchParams?: { estado?: string; fecha?: string }; // Parámetros de búsqueda para filtrar reservas
+interface Props{
+  params: Promise<{ id: string }>; // ID único del negocio
+  searchParams?: Promise<{ estado?: string; fecha?: string }>;  // Parámetros de búsqueda para filtrar reservas
 };
 
 /**
@@ -18,17 +18,18 @@ type PageProps = {
  * Permite filtrar las reservas por estado y fecha.
  * Si el usuario no está autenticado o no es propietario del negocio, redirige a la página correspondiente.
  */
-export default async function ReservasNegocioPage({ params, searchParams }: PageProps) {
+export default async function ReservasNegocioPage({ params, searchParams }: Props) {
   /**
    * Obtiene la sesión del usuario desde el servidor.
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
+  const { id } = await params;
+  const { estado: estadoFiltro, fecha: fechaFiltro } = (await searchParams) || {};
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
-  const estadoFiltro = searchParams?.estado; // Filtro por estado de la reserva
-  const fechaFiltro = searchParams?.fecha; // Filtro por fecha de la reserva
 
   /**
    * Elimina reservas pasadas que están pendientes o canceladas.
@@ -52,7 +53,7 @@ export default async function ReservasNegocioPage({ params, searchParams }: Page
    */
   const negocio = await prisma.negocio.findFirst({
     where: {
-      id: params.id,
+      id,
       propietario: { email: session.user.email },
     },
     include: {

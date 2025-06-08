@@ -5,10 +5,10 @@ import { prisma } from "@/lib/prisma";
 import ServicioPublicoCard from "@/components/ServicioPublicoCard";
 import PageWrapper from "@/components/ui/PageWrapper";
 
-type PageProps = {
-  params: {
-    id: string; // ID del negocio
-  };
+interface Props{
+  params: Promise <{
+    id: string; // ID único del negocio 
+  }>;
 };
 
 /**
@@ -18,12 +18,13 @@ type PageProps = {
  * Si el usuario no está autenticado, redirige a la página de inicio de sesión.
  * Si el negocio no existe, redirige a la página de reservas.
  */
-export default async function ServiciosDelNegocio({ params }: PageProps) {
+export default async function ServiciosDelNegocio({ params }: Props) {
   /**
    * Obtiene la sesión del usuario desde el servidor.
    * 
    * Utiliza `next-auth` para verificar si el usuario está autenticado.
    */
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   /**
@@ -39,7 +40,7 @@ export default async function ServiciosDelNegocio({ params }: PageProps) {
    * Utiliza Prisma para buscar el negocio por su ID e incluir los servicios asociados.
    */
   const negocio = await prisma.negocio.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       servicios: true,
     },
