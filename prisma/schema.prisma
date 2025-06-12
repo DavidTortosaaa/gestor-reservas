@@ -36,7 +36,7 @@ model Negocio {
   direccion   String?
   horario_apertura String
   horario_cierre   String
-  propietario Usuario  @relation(fields: [propietarioId], references: [id])
+  propietario Usuario  @relation(fields: [propietarioId], references: [id], onDelete: Cascade)
   propietarioId String
   servicios   Servicio[]
 }
