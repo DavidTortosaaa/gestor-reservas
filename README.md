@@ -1,5 +1,8 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## IMPORTANTE!
+Actualmente este proyecto no se encuentra desplegado, por lo que no se puede acceder en la web. Si se desea descargar e iniciarlo localmente, serán necesarias las variables de entorno para la autenticación, el correo y la api de google maps
+
 ## Getting Started
 
 First, run the development server:
