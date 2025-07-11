@@ -1,9 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## IMPORTANTE!
-Actualmente este proyecto no se encuentra desplegado, por lo que no se puede acceder en la web. Si se desea descargar e iniciarlo localmente, serán necesarias las variables de entorno para la autenticación, el correo y la api de google maps.
 
-No se encuentra 100% terminado por falta de tiempo. Presenta un par de errores al pulsar repetidamente los botones y no permitir que la aplicación cargue normalmente, además de disponer de varios aspectos mejorables como la recuperación de la contraseña de un usuario, etc.
+## ⚠️ IMPORTANTE
+
+Actualmente este proyecto no se encuentra desplegado, por lo que no se puede acceder desde la web.  
+Si se desea descargar e iniciarlo localmente, serán necesarias las variables de entorno para:
+
+- Autenticación
+- Correo
+- API de Google Maps
+- Base de datos
+
+> Anteriormente, la base de datos estaba alojada en un servidor, pero ya no se encuentra disponible.  
+> Además, se debe realizar el despliegue en Vercel para su funcionamiento completo.
+
+Este proyecto **no se encuentra 100% terminado** por falta de tiempo.  
+Presenta algunos errores al pulsar repetidamente los botones, lo cual puede impedir que la aplicación cargue correctamente.  
+También hay funcionalidades pendientes o mejorables, como la recuperación de contraseña de los usuarios.
+
+---
+
+## 🚀 Introducción del Proyecto
+
+Este proyecto consiste en el desarrollo de una plataforma web de gestión de reservas orientada a **múltiples negocios**, implementada con **React** y **Next.js**.  
+La aplicación permite que distintos establecimientos —como peluquerías, clínicas, gimnasios o centros de estética— gestionen sus citas y horarios de manera **independiente** dentro de un entorno compartido.
+
+Cada negocio tendrá su propio espacio para administrar sus servicios, horarios y clientes, optimizando así la organización interna y la experiencia del usuario final.
+
+---
+
+## 🎯 Objetivos
+
+### Objetivo General
+
+Desarrollar una plataforma web multinegocio para la gestión de reservas, facilitando la administración de horarios y servicios entre negocios y clientes.
+
+### Objetivos Específicos
+
+- Permitir a los negocios registrar y gestionar su perfil, horarios y servicios.  
+- Facilitar a los clientes la búsqueda de negocios y la reserva de servicios.  
+- Implementar un sistema de notificaciones automáticas para confirmar y recordar citas.  
+- Ofrecer un panel de control para que cada negocio gestione sus reservas y visualice su agenda.
+
+---
+
+## ⚙️ Opciones y Funcionalidades de la Aplicación
+
+### Opciones para Clientes
+
+- Registro e inicio de sesión.  
+- Búsqueda de negocios registrados.  
+- Solicitud de cita con selección de negocio, servicio y horario disponible.  
+- Cancelación o modificación de citas.  
+- Visualización del historial de reservas.  
+- Notificaciones de citas.  
+- Perfil de usuario con datos personales.
+
+### Opciones para Negocios
+
+- Registro e inicio de sesión.  
+- Creación y gestión de perfil del negocio (nombre, dirección, horarios, logo, etc.).  
+- Configuración de servicios con su respectiva duración y precio.  
+- Gestión de la disponibilidad horaria.  
+- Visualización de las reservas y posibilidad de confirmar o rechazar.  
+- Gestión de citas: creación, modificación y cancelación.  
+- Notificaciones automáticas a clientes sobre cambios o cancelaciones.
+
+---
+
+## 🧰 Tecnologías a Utilizar
+
+### Frontend
+
+- **React con Next.js** → Para la creación de la interfaz y el manejo de páginas dinámicas.  
+- **Tailwind CSS** → Para el diseño de una interfaz moderna y adaptable.
+
+### Backend
+
+- **Next.js (API Routes)** → Para la lógica del servidor y la gestión de reservas.  
+- **Node.js** → Para el entorno de ejecución del backend.  
+- **NextAuth.js** → Para la autenticación de usuarios.
+
+### Base de Datos
+
+- **PostgreSQL** → Para la gestión relacional de los datos.  
+- **Prisma ORM** → Para facilitar las consultas y manipulación de la base de datos.
+
+### Notificaciones
+
+- **Nodemailer** → Para el envío automático de correos electrónicos (confirmaciones, recordatorios, etc.).
+
+### Despliegue
+
+- **Vercel** → Para el despliegue de la aplicación, aprovechando su integración nativa con Next.js.
+
+---
+
+**Desarrollado por:**  
+**David Tortosa Sánchez**
 
 ## Getting Started
 
@@ -25,17 +118,4 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
