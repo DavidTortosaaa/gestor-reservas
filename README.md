@@ -16,6 +16,7 @@ Si se desea descargar e iniciarlo localmente, serán necesarias las variables de
 Este proyecto **no se encuentra 100% terminado** por falta de tiempo.  
 Presenta algunos errores al pulsar repetidamente los botones, lo cual puede impedir que la aplicación cargue correctamente.  
 También hay funcionalidades pendientes o mejorables, como la recuperación de contraseña de los usuarios.
+Esto se debe también al uso de tecnologías nuevas. Previamente solo disponía de experiencia con nodejs, por lo que tuve que aprender el resto en tiempo record...!
 
 ---
 
